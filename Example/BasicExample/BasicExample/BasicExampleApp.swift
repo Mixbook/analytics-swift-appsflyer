@@ -63,7 +63,7 @@ struct BasicExampleApp: App {
     }
 }
 
-class AFDelgate: NSObject, AppsFlyerLibDelegate, DeepLinkDelegate{
+class AFDelgate: NSObject, AppsFlyerLibDelegate, AppsFlyerDeepLinkDelegate{
     func onConversionDataSuccess(_ conversionInfo: [AnyHashable : Any]) {
         print("moris testing onConversionDataSuccess")
     }

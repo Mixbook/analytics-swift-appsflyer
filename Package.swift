@@ -6,6 +6,7 @@ import PackageDescription
 let package = Package(
     name: "SegmentAppsFlyer",
     platforms: [
+        .macOS("10.15"),
         .iOS("13.0"),
         .tvOS("13.0"),
         .watchOS("7.1")

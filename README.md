@@ -141,7 +141,7 @@ struct NewAnalyticsAppsflyerIntegrationApp: App {
 ### <a id="ddl-swift"> Swift
 In order to use Unified Deep linking you need to:
   
-  1. Create a class applies the DeepLinkDelegate delgeate
+  1. Create a class applies the AppsFlyerDeepLinkDelegate delgeate
   2. Pass the initialized class to the AppsflyerDestination
   ```swift
   let factoryWithDelegate: SEGAppsFlyerIntegrationFactory = SEGAppsFlyerIntegrationFactory.create(withLaunch: self, andDeepLinkDelegate: self)
@@ -173,7 +173,7 @@ struct NewAnalyticsAppsflyerIntegrationApp: App {
     }
 ...
 ...
-  class AFDelgate: NSObject, DeepLinkDelegate{
+  class AFDelgate: NSObject, AppsFlyerDeepLinkDelegate{
     func didResolveDeepLink(_ result: DeepLinkResult) {
         print("Deep Link: \(result)")
     }

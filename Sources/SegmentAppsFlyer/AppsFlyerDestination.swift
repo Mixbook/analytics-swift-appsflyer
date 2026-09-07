@@ -49,7 +49,7 @@ public class AppsFlyerDestination: UIResponder, DestinationPlugin  {
     fileprivate var settings: AppsFlyerSettings? = nil
 
     private weak var segDelegate: AppsFlyerLibDelegate?
-    private weak var segDLDelegate: DeepLinkDelegate?
+    private weak var segDLDelegate: AppsFlyerDeepLinkDelegate?
 
     private var isFirstLaunch = true
     private var manualMode: Bool = false
@@ -62,9 +62,9 @@ public class AppsFlyerDestination: UIResponder, DestinationPlugin  {
     ///
     /// - Parameters:
     ///   - segDelegate: When provided, this delegate will get called back for all AppsFlyerDelegate methods - ``onConversionDataSuccess(_:)``, ``onConversionDataFail(_:)``, ``onAppOpenAttribution(_:)``, ``onAppOpenAttributionFailure(_:)``
-    ///   - segDLDelegate: When provided, this delegate will get called back for all DeepLinkDelegate routines, or just ``didResolveDeeplink``
+    ///   - segDLDelegate: When provided, this delegate will get called back for all AppsFlyerDeepLinkDelegate routines, or just ``didResolveDeeplink``
     public init(segDelegate: AppsFlyerLibDelegate? = nil,
-                segDLDelegate: DeepLinkDelegate? = nil,
+                segDLDelegate: AppsFlyerDeepLinkDelegate? = nil,
                 manualMode: Bool = false) {
         self.segDelegate = segDelegate
         self.segDLDelegate = segDLDelegate
@@ -79,8 +79,7 @@ public class AppsFlyerDestination: UIResponder, DestinationPlugin  {
         guard let settings: AppsFlyerSettings = settings.integrationSettings(forPlugin: self) else { return }
         self.settings = settings
         
-        AppsFlyerLib.shared().appsFlyerDevKey = settings.appsFlyerDevKey
-        AppsFlyerLib.shared().appleAppID = settings.appleAppID
+        AppsFlyerLib.shared().initialize(devKey: settings.appsFlyerDevKey, appId: settings.appleAppID)
         AppsFlyerLib.shared().setPluginInfo(plugin:Plugin.segment, version:"2.0.0", additionalParams:["Segment":"Analytics-Swift","Platform":"iOS"])
         
         // Commented this in order to let the developer set it as suits them.
@@ -289,32 +288,6 @@ extension AppsFlyerDestination: AppsFlyerLibDelegate {
     }
     
     
-    public func onAppOpenAttribution(_ attributionData: [AnyHashable: Any]) {
-        segDelegate?.onAppOpenAttribution?(attributionData)
-        if let media_source = attributionData["media_source"] , let campaign = attributionData["campaign"],
-           let referrer  = attributionData["http_referrer"] {
-            
-            let campaign: [String: Any] = [
-                "source": media_source,
-                "name": campaign,
-                "url": referrer
-            ]
-            let campaignStr = (campaign.compactMap({ (key, value) -> String in
-                return "\(key)=\(value)"
-            }) as Array).joined(separator: ";")
-            let properties: [String: Codable] = [
-                "provider": "AppsFlyer",
-                "campaign": campaignStr
-            ]
-            
-            analytics?.track(name: "Deep Link Opened", properties: properties)
-        }
-    }
-    
-    
-    public func onAppOpenAttributionFailure(_ error: Error) {
-        segDelegate?.onAppOpenAttributionFailure?(error)
-    }
 }
 
 extension AppsFlyerDestination: VersionedPlugin {
@@ -325,7 +298,7 @@ extension AppsFlyerDestination: VersionedPlugin {
 
 //MARK: - AppsFlyer DeepLink Delegate conformance
 
-extension AppsFlyerDestination: DeepLinkDelegate, UIApplicationDelegate {
+extension AppsFlyerDestination: AppsFlyerDeepLinkDelegate, UIApplicationDelegate {
     
     public func didResolveDeepLink(_ result: DeepLinkResult) {
         segDLDelegate?.didResolveDeepLink?(result)
