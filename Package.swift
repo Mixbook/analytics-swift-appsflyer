@@ -6,6 +6,7 @@ import PackageDescription
 let package = Package(
     name: "SegmentAppsFlyer",
     platforms: [
+        .macOS("10.15"),
         .iOS("13.0"),
         .tvOS("13.0"),
         .watchOS("7.1")
@@ -27,7 +28,7 @@ let package = Package(
         .package(
             name: "AppsFlyerLib-Dynamic",
             url: "https://github.com/AppsFlyerSDK/AppsFlyerFramework-Dynamic",
-            .exact("6.17.8")
+            .exact("7.0.2")
         )
     ],
     targets: [
